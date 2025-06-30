@@ -3,7 +3,7 @@
  * Lightweight Pure JavaScript Component System
  * 
  * @version 1.0.0
- * @author Your Name
+ * @author Mubbasher Mukhtar (https://www.linkedin.com/in/mubbasher-mukhtar/)
  * @license MIT
  */
 
