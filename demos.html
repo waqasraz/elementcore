@@ -21,7 +21,7 @@
         .header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 2rem 0;
+            padding: 0.3rem 0;
             text-align: center;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
@@ -38,7 +38,7 @@
         
         .nav {
             background: white;
-            padding: 1rem 0;
+            padding: 0.2rem 0;
             border-bottom: 1px solid #eee;
             position: sticky;
             top: 0;
@@ -75,7 +75,7 @@
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 2rem;
+            padding: 0.2rem;
         }
         
         .demo-section {
@@ -106,7 +106,7 @@
         .demo-content {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            min-height: 300px;
+            min-height: 500px;
         }
         
         .code-panel {
@@ -126,7 +126,7 @@
         .code-editor {
             flex: 1;
             font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
-            font-size: 14px;
+            font-size: 10px;
             border: none;
             outline: none;
             padding: 1rem;
@@ -140,8 +140,8 @@
             background: #48bb78;
             color: white;
             border: none;
-            padding: 0.75rem 1.5rem;
-            margin: 1rem;
+            padding: 0.5rem 0.7rem;
+            margin: 0.3rem;
             border-radius: 6px;
             cursor: pointer;
             font-weight: 500;
@@ -184,7 +184,7 @@
         .todo-editor {
             background: #1a202c;
             color: #e2e8f0;
-            padding: 1.5rem;
+            padding: 0.2rem;
             border-bottom: 1px solid #eee;
         }
         
@@ -195,15 +195,15 @@
             color: #e2e8f0;
             border: 1px solid #4a5568;
             border-radius: 6px;
-            padding: 1rem;
+            padding: 0.3rem;
             font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
-            font-size: 14px;
+            font-size: 12px;
             line-height: 1.5;
             resize: vertical;
         }
         
         .todo-result {
-            padding: 2rem;
+            padding: 0.3rem;
             background: #f8f9fa;
         }
         
@@ -243,8 +243,10 @@
         <div class="nav-container">
             <button class="nav-tab active" onclick="switchTab('concepts')">Core Concepts</button>
             <button class="nav-tab" onclick="switchTab('todo')">TodoApp Demo</button>
+            <button class="nav-tab" onclick="switchTab('secureapp')">Secure Dashboard App</button>
         </div>
     </nav>
+    
     
     <div class="container">
         <!-- Core Concepts Section -->
@@ -357,43 +359,52 @@ app.render({ tag: 'Counter' });</textarea>
             tag: 'div',
             style: { padding: '20px' },
             children: [
+                // Login form placeholder - always rendered, hidden/shown via style
                 {
-                    if: () => this.state.isLoggedIn,
-                    then: {
-                        tag: 'div',
-                        style: { 
-                            background: '#c6f6d5', 
-                            padding: '15px', 
-                            borderRadius: '8px',
-                            marginBottom: '10px'
-                        },
-                        children: [
-                            `Welcome, ${this.state.username}!`,
-                            {
-                                tag: 'button',
-                                style: { marginLeft: '10px', padding: '5px 10px' },
-                                children: ['Logout'],
-                                onclick: () => this.logout()
-                            }
-                        ]
+                    tag: 'div',
+                    const: 'loginForm',
+                    style: { 
+                        display: this.state.isLoggedIn ? 'none' : 'block'
                     },
-                    else: {
-                        tag: 'div',
-                        children: [
-                            {
-                                tag: 'input',
-                                const: 'usernameInput',
-                                placeholder: 'Enter username',
-                                style: { padding: '8px', marginRight: '10px' }
-                            },
-                            {
-                                tag: 'button',
-                                children: ['Login'],
-                                style: { padding: '8px 15px' },
-                                onclick: () => this.login()
-                            }
-                        ]
-                    }
+                    children: [
+                        {
+                            tag: 'input',
+                            const: 'usernameInput',
+                            placeholder: 'Enter username',
+                            style: { padding: '8px', marginRight: '10px' }
+                        },
+                        {
+                            tag: 'button',
+                            children: ['Login'],
+                            style: { padding: '8px 15px' },
+                            onclick: () => this.login()
+                        }
+                    ]
+                },
+                // Welcome message placeholder - always rendered, hidden/shown via style
+                {
+                    tag: 'div',
+                    const: 'welcomeMessage',
+                    style: { 
+                        display: this.state.isLoggedIn ? 'block' : 'none',
+                        background: '#c6f6d5', 
+                        padding: '15px', 
+                        borderRadius: '8px',
+                        marginBottom: '10px'
+                    },
+                    children: [
+                        {
+                            tag: 'span',
+                            const: 'usernameDisplay',
+                            children: [`Welcome, ${this.state.username}!`]
+                        },
+                        {
+                            tag: 'button',
+                            style: { marginLeft: '10px', padding: '5px 10px' },
+                            children: ['Logout'],
+                            onclick: () => this.logout()
+                        }
+                    ]
                 }
             ]
         };
@@ -403,19 +414,24 @@ app.render({ tag: 'Counter' });</textarea>
         const username = this.usernameInput.value.trim();
         if (username) {
             this.setState({ isLoggedIn: true, username });
-            this.rerender();
         }
     }
 
     logout() {
         this.setState({ isLoggedIn: false, username: '' });
-        this.rerender();
     }
 
-    rerender() {
-        const newElement = this.createDOMElement(this.render());
-        this.element.parentNode.replaceChild(newElement, this.element);
-        this.element = newElement;
+    onStateChange() {
+        // Direct DOM manipulation - no re-rendering!
+        if (this.state.isLoggedIn) {
+            this.loginForm.style.display = 'none';
+            this.welcomeMessage.style.display = 'block';
+            this.usernameDisplay.textContent = `Welcome, ${this.state.username}!`;
+        } else {
+            this.loginForm.style.display = 'block';
+            this.welcomeMessage.style.display = 'none';
+            this.usernameInput.value = '';
+        }
     }
 }
 
@@ -587,7 +603,7 @@ class TodoSummary extends BaseComponent {
             tag: 'div',
             style: {
                 background: '#edf2f7',
-                padding: '15px',
+                padding: '5px',
                 borderRadius: '6px',
                 marginBottom: '20px',
                 textAlign: 'center'
@@ -732,6 +748,7 @@ class TodoApp extends BaseComponent {
         const todos = this.state.todos.filter(todo => todo.id !== id);
         this.setState({ todos });
     }
+    onMount() { this.onStateChange() };
 
     onStateChange() {
         // Update summary
@@ -773,6 +790,199 @@ app.render({ tag: 'TodoApp' });</textarea>
                 <div class="todo-result">
                     <div class="result-header">Live TodoApp Demo</div>
                     <div id="result-todo"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="secureapp" class="demo-section">
+            <div class="todo-demo">
+                <div class="demo-header">Secure App with dashdboard (admin toke: admin123), (User roken: user456), other tokens invalid</div>
+                <div class="todo-editor">
+                    <textarea id="secureapp-code">
+                        class SecureApp extends BaseComponent {
+    constructor(id, props, manager) {
+        super(id, props, manager);
+        this.state = { 
+            isAuthenticated: false, 
+            userRole: null,
+            authToken: null 
+        };
+    }
+
+    render() {
+        return {
+            tag: 'div',
+            style: { padding: '20px' },
+            children: [
+                {
+                    tag: 'h2',
+                    children: ['Secure Application']
+                },
+                // Authentication section
+                {
+                    tag: 'div',
+                    const: 'authSection',
+                    children: [
+                        {
+                            tag: 'input',
+                            const: 'tokenInput',
+                            placeholder: 'Enter auth token (try: admin123 or user456)',
+                            style: { padding: '8px', marginRight: '10px', width: '300px' }
+                        },
+                        {
+                            tag: 'button',
+                            children: ['Login'],
+                            onclick: () => this.authenticate()
+                        }
+                    ]
+                },
+                // Placeholder for secure content - initially empty
+                {
+                    tag: 'div',
+                    const: 'secureContentArea',
+                    style: { marginTop: '20px' }
+                }
+            ]
+        };
+    }
+
+    authenticate() {
+        const token = this.tokenInput.value.trim();
+        
+        // Simulate authentication
+        if (token === 'admin123') {
+            this.setState({ 
+                isAuthenticated: true, 
+                userRole: 'admin',
+                authToken: token 
+            });
+        } else if (token === 'user456') {
+            this.setState({ 
+                isAuthenticated: true, 
+                userRole: 'user',
+                authToken: token 
+            });
+        } else {
+            alert('Invalid token');
+        }
+    }
+
+    onStateChange() {
+        if (this.state.isAuthenticated) {
+            // Hide auth section
+            this.authSection.style.display = 'none';
+            
+            // Dynamically create and render secure components
+            this.renderSecureContent();
+        }
+    }
+
+    renderSecureContent() {
+        // Create component based on user role
+        let secureComponent;
+        
+        if (this.state.userRole === 'admin') {
+            secureComponent = this.manager.createComponent({
+                tag: 'AdminPanel',
+                authToken: this.state.authToken
+            });
+        } else if (this.state.userRole === 'user') {
+            secureComponent = this.manager.createComponent({
+                tag: 'UserDashboard',
+                authToken: this.state.authToken
+            });
+        }
+
+        if (secureComponent) {
+            const element = secureComponent.renderOnce();
+            this.secureContentArea.appendChild(element);
+        }
+    }
+}
+
+class AdminPanel extends BaseComponent {
+    render() {
+        return {
+            tag: 'div',
+            style: {
+                background: '#fff5f5',
+                border: '2px solid #fc8181',
+                padding: '20px',
+                borderRadius: '8px'
+            },
+            children: [
+                {
+                    tag: 'h3',
+                    style: { color: '#c53030' },
+                    children: ['🔒 ADMIN PANEL']
+                },
+                {
+                    tag: 'p',
+                    children: [`Auth Token: ${this.props.authToken}`]
+                },
+                {
+                    tag: 'div',
+                    children: [
+                        '• Manage Users',
+                        { tag: 'br' },
+                        '• System Settings',
+                        { tag: 'br' },
+                        '• Security Logs'
+                    ]
+                }
+            ]
+        };
+    }
+}
+
+// User Dashboard Component (only created after authentication)
+class UserDashboard extends BaseComponent {
+    render() {
+        return {
+            tag: 'div',
+            style: {
+                background: '#f0fff4',
+                border: '2px solid #68d391',
+                padding: '20px',
+                borderRadius: '8px'
+            },
+            children: [
+                {
+                    tag: 'h3',
+                    style: { color: '#2f855a' },
+                    children: ['👤 USER DASHBOARD']
+                },
+                {
+                    tag: 'p',
+                    children: [`Auth Token: ${this.props.authToken}`]
+                },
+                {
+                    tag: 'div',
+                    children: [
+                        '• View Profile',
+                        { tag: 'br' },
+                        '• My Documents',
+                        { tag: 'br' },
+                        '• Account Settings'
+                    ]
+                }
+            ]
+        };
+    }
+}
+
+ComponentRegistry.register('SecureApp', SecureApp);
+ComponentRegistry.register('AdminPanel', AdminPanel);
+ComponentRegistry.register('UserDashboard', UserDashboard);
+
+const app = ElementCore.create(document.getElementById('result-secureapp'));
+app.render({ tag: 'SecureApp' });
+                    </textarea>
+                    <button class="run-button" onclick="runSecureApp()">Run Secure App</button>
+                </div>
+                <div class="todo-result">
+                    <div class="result-header">Live TodoApp Demo</div>
+                    <div id="result-secureapp"></div>
                 </div>
             </div>
         </div>
@@ -868,6 +1078,46 @@ app.render({ tag: 'TodoApp' });</textarea>
                 resultElement.parentNode.insertBefore(errorDiv, resultElement);
             }
         }
+
+        function runSecureApp() {
+            const code = document.getElementById('secureapp-code').value;
+            const resultElement = document.getElementById('result-secureapp');
+            
+            try {
+                // Clear previous result
+                resultElement.innerHTML = '';
+                
+                // Clear any previous todo component registrations
+                const components = ComponentRegistry.list();
+                components.forEach(name => {
+                    if (name.includes('SecureApp') || name === 'AdminPanel' || name === 'UserDashboard') {
+                        ComponentRegistry.remove(name);
+                    }
+                });
+                
+                // Execute the code
+                eval(code);
+                
+                // Clear any error messages
+                const errorElements = resultElement.parentNode.querySelectorAll('.error');
+                errorElements.forEach(el => el.remove());
+                
+            } catch (error) {
+                console.error('Secure App execution error:', error);
+                
+                // Remove any existing error messages
+                const existingErrors = resultElement.parentNode.querySelectorAll('.error');
+                existingErrors.forEach(el => el.remove());
+                
+                // Show error message
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'error';
+                errorDiv.textContent = `Error: ${error.message}`;
+                resultElement.parentNode.insertBefore(errorDiv, resultElement);
+            }
+        }
+
+        
 
         // Run initial demos on page load
         document.addEventListener('DOMContentLoaded', function() {
