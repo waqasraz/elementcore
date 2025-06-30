@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ElementCore Framework Demo</title>
+    <script src="./elementcore.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8f9fa;
+            color: #333;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem 0;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .nav {
+            background: white;
+            padding: 1rem 0;
+            border-bottom: 1px solid #eee;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            gap: 2rem;
+        }
+        
+        .nav-tab {
+            padding: 0.5rem 1rem;
+            border: none;
+            background: none;
+            cursor: pointer;
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+        
+        .nav-tab.active {
+            background: #667eea;
+            color: white;
+        }
+        
+        .nav-tab:hover:not(.active) {
+            background: #f1f3f4;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .demo-section {
+            display: none;
+            margin-bottom: 3rem;
+        }
+        
+        .demo-section.active {
+            display: block;
+        }
+        
+        .demo-item {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.08);
+            margin-bottom: 2rem;
+            overflow: hidden;
+        }
+        
+        .demo-header {
+            background: #f8f9fa;
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #eee;
+            font-weight: 600;
+            color: #495057;
+        }
+        
+        .demo-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            min-height: 300px;
+        }
+        
+        .code-panel {
+            border-right: 1px solid #eee;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .code-header {
+            background: #2d3748;
+            color: white;
+            padding: 0.75rem 1rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        
+        .code-editor {
+            flex: 1;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 14px;
+            border: none;
+            outline: none;
+            padding: 1rem;
+            background: #1a202c;
+            color: #e2e8f0;
+            resize: none;
+            line-height: 1.5;
+        }
+        
+        .run-button {
+            background: #48bb78;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            margin: 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+        
+        .run-button:hover {
+            background: #38a169;
+        }
+        
+        .result-panel {
+            padding: 1.5rem;
+            background: #fafafa;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .result-header {
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #495057;
+        }
+        
+        .result-content {
+            flex: 1;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 1rem;
+            min-height: 200px;
+        }
+        
+        .todo-demo {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+        
+        .todo-editor {
+            background: #1a202c;
+            color: #e2e8f0;
+            padding: 1.5rem;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .todo-editor textarea {
+            width: 100%;
+            height: 400px;
+            background: #2d3748;
+            color: #e2e8f0;
+            border: 1px solid #4a5568;
+            border-radius: 6px;
+            padding: 1rem;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            resize: vertical;
+        }
+        
+        .todo-result {
+            padding: 2rem;
+            background: #f8f9fa;
+        }
+        
+        .error {
+            background: #fed7d7;
+            color: #c53030;
+            padding: 1rem;
+            border-radius: 6px;
+            margin: 1rem 0;
+            font-family: monospace;
+            font-size: 14px;
+        }
+
+        @media (max-width: 768px) {
+            .demo-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .code-panel {
+                border-right: none;
+                border-bottom: 1px solid #eee;
+            }
+            
+            .container {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>ElementCore Framework</h1>
+        <p>Lightweight Pure JavaScript Component System</p>
+    </div>
+    
+    <nav class="nav">
+        <div class="nav-container">
+            <button class="nav-tab active" onclick="switchTab('concepts')">Core Concepts</button>
+            <button class="nav-tab" onclick="switchTab('todo')">TodoApp Demo</button>
+        </div>
+    </nav>
+    
+    <div class="container">
+        <!-- Core Concepts Section -->
+        <div id="concepts" class="demo-section active">
+            <div class="demo-item">
+                <div class="demo-header">Basic Element Creation</div>
+                <div class="demo-content">
+                    <div class="code-panel">
+                        <div class="code-header">JavaScript Code</div>
+                        <textarea class="code-editor" id="basic-code">const app = ElementCore.create(document.getElementById('result-basic'));
+
+app.render({
+    tag: 'div',
+    style: {
+        padding: '20px',
+        background: 'linear-gradient(45deg, #667eea, #764ba2)',
+        color: 'white',
+        borderRadius: '8px',
+        textAlign: 'center'
+    },
+    children: [
+        { tag: 'h2', children: ['Hello ElementCore!'] },
+        { tag: 'p', children: ['This is a basic component'] }
+    ]
+});</textarea>
+                        <button class="run-button" onclick="runCode('basic')">Run Code</button>
+                    </div>
+                    <div class="result-panel">
+                        <div class="result-header">Live Result</div>
+                        <div class="result-content" id="result-basic"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="demo-item">
+                <div class="demo-header">Direct DOM Manipulation with 'const'</div>
+                <div class="demo-content">
+                    <div class="code-panel">
+                        <div class="code-header">JavaScript Code</div>
+                        <textarea class="code-editor" id="const-code">class Counter extends BaseComponent {
+    constructor(id, props, manager) {
+        super(id, props, manager);
+        this.state = { count: 0 };
+    }
+
+    render() {
+        return {
+            tag: 'div',
+            style: { padding: '20px', textAlign: 'center' },
+            children: [
+                {
+                    tag: 'h3',
+                    const: 'display',
+                    children: [`Count: ${this.state.count}`]
+                },
+                {
+                    tag: 'button',
+                    style: {
+                        padding: '10px 20px',
+                        background: '#48bb78',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '4px',
+                        cursor: 'pointer',
+                        margin: '10px'
+                    },
+                    children: ['Increment'],
+                    onclick: () => this.increment()
+                }
+            ]
+        };
+    }
+
+    increment() {
+        this.setState({ count: this.state.count + 1 });
+    }
+
+    onStateChange() {
+        // Direct DOM manipulation - no re-render!
+        this.display.textContent = `Count: ${this.state.count}`;
+    }
+}
+
+ComponentRegistry.register('Counter', Counter);
+
+const app = ElementCore.create(document.getElementById('result-const'));
+app.render({ tag: 'Counter' });</textarea>
+                        <button class="run-button" onclick="runCode('const')">Run Code</button>
+                    </div>
+                    <div class="result-panel">
+                        <div class="result-header">Live Result</div>
+                        <div class="result-content" id="result-const"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="demo-item">
+                <div class="demo-header">Conditional Rendering</div>
+                <div class="demo-content">
+                    <div class="code-panel">
+                        <div class="code-header">JavaScript Code</div>
+                        <textarea class="code-editor" id="conditional-code">class LoginDemo extends BaseComponent {
+    constructor(id, props, manager) {
+        super(id, props, manager);
+        this.state = { isLoggedIn: false, username: '' };
+    }
+
+    render() {
+        return {
+            tag: 'div',
+            style: { padding: '20px' },
+            children: [
+                {
+                    if: () => this.state.isLoggedIn,
+                    then: {
+                        tag: 'div',
+                        style: { 
+                            background: '#c6f6d5', 
+                            padding: '15px', 
+                            borderRadius: '8px',
+                            marginBottom: '10px'
+                        },
+                        children: [
+                            `Welcome, ${this.state.username}!`,
+                            {
+                                tag: 'button',
+                                style: { marginLeft: '10px', padding: '5px 10px' },
+                                children: ['Logout'],
+                                onclick: () => this.logout()
+                            }
+                        ]
+                    },
+                    else: {
+                        tag: 'div',
+                        children: [
+                            {
+                                tag: 'input',
+                                const: 'usernameInput',
+                                placeholder: 'Enter username',
+                                style: { padding: '8px', marginRight: '10px' }
+                            },
+                            {
+                                tag: 'button',
+                                children: ['Login'],
+                                style: { padding: '8px 15px' },
+                                onclick: () => this.login()
+                            }
+                        ]
+                    }
+                }
+            ]
+        };
+    }
+
+    login() {
+        const username = this.usernameInput.value.trim();
+        if (username) {
+            this.setState({ isLoggedIn: true, username });
+            this.rerender();
+        }
+    }
+
+    logout() {
+        this.setState({ isLoggedIn: false, username: '' });
+        this.rerender();
+    }
+
+    rerender() {
+        const newElement = this.createDOMElement(this.render());
+        this.element.parentNode.replaceChild(newElement, this.element);
+        this.element = newElement;
+    }
+}
+
+ComponentRegistry.register('LoginDemo', LoginDemo);
+
+const app = ElementCore.create(document.getElementById('result-conditional'));
+app.render({ tag: 'LoginDemo' });</textarea>
+                        <button class="run-button" onclick="runCode('conditional')">Run Code</button>
+                    </div>
+                    <div class="result-panel">
+                        <div class="result-header">Live Result</div>
+                        <div class="result-content" id="result-conditional"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="demo-item">
+                <div class="demo-header">Component Namespacing</div>
+                <div class="demo-content">
+                    <div class="code-panel">
+                        <div class="code-header">JavaScript Code</div>
+                        <textarea class="code-editor" id="namespace-code">// Card.Header component
+class CardHeader extends BaseComponent {
+    render() {
+        return {
+            tag: 'div',
+            style: {
+                background: '#f8f9fa',
+                padding: '15px 20px',
+                borderBottom: '1px solid #dee2e6',
+                fontWeight: 'bold'
+            },
+            children: [this.props.title || 'Card Header']
+        };
+    }
+}
+
+// Card.Body component
+class CardBody extends BaseComponent {
+    render() {
+        return {
+            tag: 'div',
+            style: { padding: '20px' },
+            children: this.props.children || ['Card body content']
+        };
+    }
+}
+
+// Card.Footer component
+class CardFooter extends BaseComponent {
+    render() {
+        return {
+            tag: 'div',
+            style: {
+                background: '#f8f9fa',
+                padding: '15px 20px',
+                borderTop: '1px solid #dee2e6',
+                fontSize: '14px',
+                color: '#666'
+            },
+            children: this.props.children || ['Card footer']
+        };
+    }
+}
+
+// Register namespaced components
+ComponentRegistry.register('Card.Header', CardHeader);
+ComponentRegistry.register('Card.Body', CardBody);
+ComponentRegistry.register('Card.Footer', CardFooter);
+
+const app = ElementCore.create(document.getElementById('result-namespace'));
+app.render({
+    tag: 'div',
+    style: {
+        border: '1px solid #dee2e6',
+        borderRadius: '8px',
+        overflow: 'hidden',
+        boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+    },
+    children: [
+        { tag: 'Card.Header', title: 'User Profile' },
+        { 
+            tag: 'Card.Body', 
+            children: [
+                'Name: John Doe',
+                { tag: 'br' },
+                'Email: john@example.com'
+            ]
+        },
+        { 
+            tag: 'Card.Footer', 
+            children: ['Last updated: Today']
+        }
+    ]
+});</textarea>
+                        <button class="run-button" onclick="runCode('namespace')">Run Code</button>
+                    </div>
+                    <div class="result-panel">
+                        <div class="result-header">Live Result</div>
+                        <div class="result-content" id="result-namespace"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- TodoApp Demo Section -->
+        <div id="todo" class="demo-section">
+            <div class="todo-demo">
+                <div class="demo-header">TodoApp with Namespaced Components</div>
+                <div class="todo-editor">
+                    <textarea id="todo-code">// Todo.Item component
+class TodoItem extends BaseComponent {
+    render() {
+        const { todo, onToggle, onDelete } = this.props;
+        return {
+            tag: 'div',
+            style: {
+                display: 'flex',
+                alignItems: 'center',
+                padding: '12px',
+                border: '1px solid #e2e8f0',
+                borderRadius: '6px',
+                marginBottom: '8px',
+                background: todo.completed ? '#f0fff4' : 'white'
+            },
+            children: [
+                {
+                    tag: 'input',
+                    type: 'checkbox',
+                    checked: todo.completed,
+                    style: { marginRight: '12px' },
+                    onchange: () => onToggle(todo.id)
+                },
+                {
+                    tag: 'span',
+                    style: {
+                        flex: '1',
+                        textDecoration: todo.completed ? 'line-through' : 'none',
+                        color: todo.completed ? '#666' : '#333'
+                    },
+                    children: [todo.text]
+                },
+                {
+                    tag: 'button',
+                    style: {
+                        background: '#f56565',
+                        color: 'white',
+                        border: 'none',
+                        padding: '4px 8px',
+                        borderRadius: '4px',
+                        cursor: 'pointer'
+                    },
+                    children: ['Delete'],
+                    onclick: () => onDelete(todo.id)
+                }
+            ]
+        };
+    }
+}
+
+// Todo.Summary component
+class TodoSummary extends BaseComponent {
+    render() {
+        const { todos } = this.props;
+        const completed = todos.filter(t => t.completed).length;
+        const total = todos.length;
+        
+        return {
+            tag: 'div',
+            style: {
+                background: '#edf2f7',
+                padding: '15px',
+                borderRadius: '6px',
+                marginBottom: '20px',
+                textAlign: 'center'
+            },
+            children: [
+                {
+                    tag: 'strong',
+                    children: [`${completed} of ${total} tasks completed`]
+                },
+                total > 0 ? {
+                    tag: 'div',
+                    style: { marginTop: '8px' },
+                    children: [
+                        {
+                            tag: 'div',
+                            style: {
+                                background: '#cbd5e0',
+                                height: '8px',
+                                borderRadius: '4px',
+                                overflow: 'hidden'
+                            },
+                            children: [
+                                {
+                                    tag: 'div',
+                                    style: {
+                                        background: '#48bb78',
+                                        height: '100%',
+                                        width: `${(completed / total) * 100}%`,
+                                        transition: 'width 0.3s ease'
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                } : ''
+            ]
+        };
+    }
+}
+
+// Main TodoApp component
+class TodoApp extends BaseComponent {
+    constructor(id, props, manager) {
+        super(id, props, manager);
+        this.state = {
+            todos: [
+                { id: 1, text: 'Learn ElementCore', completed: false },
+                { id: 2, text: 'Build awesome apps', completed: true },
+                { id: 3, text: 'Share with the world', completed: false }
+            ],
+            nextId: 4
+        };
+    }
+
+    render() {
+        return {
+            tag: 'div',
+            style: {
+                maxWidth: '600px',
+                margin: '0 auto',
+                padding: '20px'
+            },
+            children: [
+                {
+                    tag: 'h1',
+                    style: { textAlign: 'center', marginBottom: '30px' },
+                    children: ['TodoApp Demo']
+                },
+                {
+                    tag: 'Todo.Summary',
+                    todos: this.state.todos
+                },
+                {
+                    tag: 'div',
+                    style: { 
+                        display: 'flex', 
+                        marginBottom: '20px',
+                        gap: '10px'
+                    },
+                    children: [
+                        {
+                            tag: 'input',
+                            const: 'todoInput',
+                            placeholder: 'Add new todo...',
+                            style: {
+                                flex: '1',
+                                padding: '12px',
+                                border: '1px solid #e2e8f0',
+                                borderRadius: '6px'
+                            },
+                            onkeydown: (e) => e.key === 'Enter' && this.addTodo()
+                        },
+                        {
+                            tag: 'button',
+                            style: {
+                                background: '#4299e1',
+                                color: 'white',
+                                border: 'none',
+                                padding: '12px 20px',
+                                borderRadius: '6px',
+                                cursor: 'pointer'
+                            },
+                            children: ['Add'],
+                            onclick: () => this.addTodo()
+                        }
+                    ]
+                },
+                {
+                    tag: 'div',
+                    const: 'todoList'
+                }
+            ]
+        };
+    }
+
+    addTodo() {
+        const text = this.todoInput.value.trim();
+        if (!text) return;
+
+        const newTodo = {
+            id: this.state.nextId,
+            text: text,
+            completed: false
+        };
+
+        this.setState({
+            todos: [...this.state.todos, newTodo],
+            nextId: this.state.nextId + 1
+        });
+        
+        this.todoInput.value = '';
+    }
+
+    toggleTodo(id) {
+        const todos = this.state.todos.map(todo =>
+            todo.id === id ? { ...todo, completed: !todo.completed } : todo
+        );
+        this.setState({ todos });
+    }
+
+    deleteTodo(id) {
+        const todos = this.state.todos.filter(todo => todo.id !== id);
+        this.setState({ todos });
+    }
+
+    onStateChange() {
+        // Update summary
+        const summaryElement = this.element.querySelector('[id*="comp_"]');
+        if (summaryElement) {
+            const summaryInstance = this.manager.createComponent({
+                tag: 'Todo.Summary',
+                todos: this.state.todos
+            });
+            const newSummaryElement = summaryInstance.renderOnce();
+            summaryElement.parentNode.replaceChild(newSummaryElement, summaryElement);
+        }
+
+        // Update todo list
+        this.todoList.innerHTML = '';
+        this.state.todos.forEach(todo => {
+            const todoInstance = this.manager.createComponent({
+                tag: 'Todo.Item',
+                todo: todo,
+                onToggle: (id) => this.toggleTodo(id),
+                onDelete: (id) => this.deleteTodo(id)
+            });
+            const todoElement = todoInstance.renderOnce();
+            this.todoList.appendChild(todoElement);
+        });
+    }
+}
+
+// Register all components
+ComponentRegistry.register('Todo.Item', TodoItem);
+ComponentRegistry.register('Todo.Summary', TodoSummary);
+ComponentRegistry.register('TodoApp', TodoApp);
+
+// Create and render the app
+const app = ElementCore.create(document.getElementById('result-todo'));
+app.render({ tag: 'TodoApp' });</textarea>
+                    <button class="run-button" onclick="runTodoCode()">Run TodoApp</button>
+                </div>
+                <div class="todo-result">
+                    <div class="result-header">Live TodoApp Demo</div>
+                    <div id="result-todo"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function switchTab(tabName) {
+            // Update nav tabs
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Show/hide sections
+            document.querySelectorAll('.demo-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById(tabName).classList.add('active');
+        }
+
+        function runCode(demoType) {
+            const code = document.getElementById(demoType + '-code').value;
+            const resultElement = document.getElementById('result-' + demoType);
+            
+            try {
+                // Clear previous result
+                resultElement.innerHTML = '';
+                
+                // Clear any previous component registrations for this demo
+                const components = ComponentRegistry.list();
+                components.forEach(name => {
+                    if (name.includes('Demo') || name.includes('Counter') || name.includes('Card.') || name.includes('Login')) {
+                        ComponentRegistry.remove(name);
+                    }
+                });
+                
+                // Execute the code
+                eval(code);
+                
+                // Clear any error messages
+                const errorElements = resultElement.parentNode.querySelectorAll('.error');
+                errorElements.forEach(el => el.remove());
+                
+            } catch (error) {
+                console.error('Code execution error:', error);
+                
+                // Remove any existing error messages
+                const existingErrors = resultElement.parentNode.querySelectorAll('.error');
+                existingErrors.forEach(el => el.remove());
+                
+                // Show error message
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'error';
+                errorDiv.textContent = `Error: ${error.message}`;
+                resultElement.parentNode.insertBefore(errorDiv, resultElement);
+            }
+        }
+
+        function runTodoCode() {
+            const code = document.getElementById('todo-code').value;
+            const resultElement = document.getElementById('result-todo');
+            
+            try {
+                // Clear previous result
+                resultElement.innerHTML = '';
+                
+                // Clear any previous todo component registrations
+                const components = ComponentRegistry.list();
+                components.forEach(name => {
+                    if (name.includes('Todo') || name === 'TodoApp') {
+                        ComponentRegistry.remove(name);
+                    }
+                });
+                
+                // Execute the code
+                eval(code);
+                
+                // Clear any error messages
+                const errorElements = resultElement.parentNode.querySelectorAll('.error');
+                errorElements.forEach(el => el.remove());
+                
+            } catch (error) {
+                console.error('TodoApp execution error:', error);
+                
+                // Remove any existing error messages
+                const existingErrors = resultElement.parentNode.querySelectorAll('.error');
+                existingErrors.forEach(el => el.remove());
+                
+                // Show error message
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'error';
+                errorDiv.textContent = `Error: ${error.message}`;
+                resultElement.parentNode.insertBefore(errorDiv, resultElement);
+            }
+        }
+
+        // Run initial demos on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            runCode('basic');
+            runCode('const');
+            runCode('conditional');
+            runCode('namespace');
+        });
+    </script>
+</body>
+</html>
