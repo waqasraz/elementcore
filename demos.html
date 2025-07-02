@@ -344,7 +344,7 @@ app.render({ tag: 'Counter' });</textarea>
             </div>
             
             <div class="demo-item">
-                <div class="demo-header">Conditional Rendering</div>
+                <div class="demo-header">Conditional Rendering (Improved)</div>
                 <div class="demo-content">
                     <div class="code-panel">
                         <div class="code-header">JavaScript Code</div>
@@ -613,32 +613,36 @@ class TodoSummary extends BaseComponent {
                     tag: 'strong',
                     children: [`${completed} of ${total} tasks completed`]
                 },
-                total > 0 ? {
-                    tag: 'div',
-                    style: { marginTop: '8px' },
-                    children: [
-                        {
-                            tag: 'div',
-                            style: {
-                                background: '#cbd5e0',
-                                height: '8px',
-                                borderRadius: '4px',
-                                overflow: 'hidden'
-                            },
-                            children: [
-                                {
-                                    tag: 'div',
-                                    style: {
-                                        background: '#48bb78',
-                                        height: '100%',
-                                        width: `${(completed / total) * 100}%`,
-                                        transition: 'width 0.3s ease'
+                {
+                    if: total > 0,
+                    then: {
+                        tag: 'div',
+                        style: { marginTop: '8px' },
+                        children: [
+                            {
+                                tag: 'div',
+                                style: {
+                                    background: '#cbd5e0',
+                                    height: '8px',
+                                    borderRadius: '4px',
+                                    overflow: 'hidden'
+                                },
+                                children: [
+                                    {
+                                        tag: 'div',
+                                        style: {
+                                            background: '#48bb78',
+                                            height: '100%',
+                                            width: `${(completed / total) * 100}%`,
+                                            transition: 'width 0.3s ease'
+                                        }
                                     }
-                                }
-                            ]
-                        }
-                    ]
-                } : ''
+                                ]
+                            }
+                        ]
+                    },
+                    else: ''
+                }
             ]
         };
     }
@@ -908,7 +912,8 @@ class AdminPanel extends BaseComponent {
                 background: '#fff5f5',
                 border: '2px solid #fc8181',
                 padding: '20px',
-                borderRadius: '8px'
+                borderRadius: '8px',
+                marginTop: '20px'
             },
             children: [
                 {
@@ -935,7 +940,6 @@ class AdminPanel extends BaseComponent {
     }
 }
 
-// User Dashboard Component (only created after authentication)
 class UserDashboard extends BaseComponent {
     render() {
         return {
@@ -944,7 +948,8 @@ class UserDashboard extends BaseComponent {
                 background: '#f0fff4',
                 border: '2px solid #68d391',
                 padding: '20px',
-                borderRadius: '8px'
+                borderRadius: '8px',
+                marginTop: '20px'
             },
             children: [
                 {
@@ -981,7 +986,7 @@ app.render({ tag: 'SecureApp' });
                     <button class="run-button" onclick="runSecureApp()">Run Secure App</button>
                 </div>
                 <div class="todo-result">
-                    <div class="result-header">Live TodoApp Demo</div>
+                    <div class="result-header">Live Secure App Demo</div>
                     <div id="result-secureapp"></div>
                 </div>
             </div>
@@ -1087,7 +1092,7 @@ app.render({ tag: 'SecureApp' });
                 // Clear previous result
                 resultElement.innerHTML = '';
                 
-                // Clear any previous todo component registrations
+                // Clear any previous secure app component registrations
                 const components = ComponentRegistry.list();
                 components.forEach(name => {
                     if (name.includes('SecureApp') || name === 'AdminPanel' || name === 'UserDashboard') {
@@ -1116,8 +1121,6 @@ app.render({ tag: 'SecureApp' });
                 resultElement.parentNode.insertBefore(errorDiv, resultElement);
             }
         }
-
-        
 
         // Run initial demos on page load
         document.addEventListener('DOMContentLoaded', function() {
