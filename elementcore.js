@@ -9,47 +9,6 @@
 
 (function (global) {
     'use strict';
-
-    // HTML Tag Constants for syntactic sugar
-    const tags = {
-        div: { tag: "div" },
-        span: { tag: "span" },
-        p: { tag: "p" },
-        h1: { tag: "h1" },
-        h2: { tag: "h2" },
-        h3: { tag: "h3" },
-        h4: { tag: "h4" },
-        h5: { tag: "h5" },
-        h6: { tag: "h6" },
-        button: { tag: "button" },
-        input: { tag: "input" },
-        form: { tag: "form" },
-        img: { tag: "img" },
-        a: { tag: "a" },
-        ul: { tag: "ul" },
-        ol: { tag: "ol" },
-        li: { tag: "li" },
-        table: { tag: "table" },
-        thead: { tag: "thead" },
-        tbody: { tag: "tbody" },
-        tr: { tag: "tr" },
-        td: { tag: "td" },
-        th: { tag: "th" },
-        section: { tag: "section" },
-        article: { tag: "article" },
-        header: { tag: "header" },
-        footer: { tag: "footer" },
-        nav: { tag: "nav" },
-        main: { tag: "main" },
-        aside: { tag: "aside" },
-        select: { tag: "select" },
-        option: { tag: "option" },
-        textarea: { tag: "textarea" },
-        label: { tag: "label" },
-        fieldset: { tag: "fieldset" },
-        legend: { tag: "legend" }
-    };
-
     // Configuration Parser - Handles pure JS objects
     class ConfigParser {
         static parse(config) {
@@ -67,26 +26,11 @@
 
             let parsed = { ...config };
 
-            // Handle shorthand syntax
-            this.handleShorthandTags(parsed);
-
-            // Handle children shorthand: c -> children
-            if (parsed.c !== undefined && parsed.children === undefined) {
-                parsed.children = parsed.c;
-                delete parsed.c;
-            }
 
             // Handle conditional rendering
             if (config.if !== undefined) {
                 const condition = typeof config.if === 'function' ? config.if() : config.if;
                 return condition ? this.parse(config.then) : this.parse(config.else || null);
-            }
-
-            // Handle switch objects
-            if (config.switch !== undefined) {
-                const switchValue = typeof config.switch === 'function' ? config.switch() : config.switch;
-                const caseValue = config.cases[switchValue];
-                return this.parse(caseValue || config.default || null);
             }
 
             // Convert single child to array
@@ -111,23 +55,6 @@
             }
 
             return parsed;
-        }
-
-        static handleShorthandTags(config) {
-            const htmlTags = Object.keys(tags);
-
-            for (const tagName of htmlTags) {
-                if (config.hasOwnProperty(tagName) && typeof config[tagName] === 'object') {
-                    Object.assign(config, config[tagName]);
-                    config.tag = tagName;
-                    delete config[tagName];
-                    break;
-                } else if (config.hasOwnProperty(tagName) && config[tagName] === true) {
-                    config.tag = tagName;
-                    delete config[tagName];
-                    break;
-                }
-            }
         }
     }
 
@@ -344,7 +271,7 @@
 
         setState(newState) {
             this.state = { ...this.state, ...newState };
-            this.onStateChange();
+            this.onStateChange(this.state);
         }
 
         update(property, value) {
@@ -382,7 +309,8 @@
         // Lifecycle methods
         onMount() { }
         onDestroy() { }
-        onStateChange() { }
+        onStateChange({}) //Parameter and handling all up to client code or blindly update everything
+        { }
 
         // Event helpers
         emit(eventName, data) {
@@ -484,17 +412,11 @@
         ConfigParser: ConfigParser,
         PluginManager: PluginManager,
 
-        // Tags reference
-        tags: tags,
-
         // Version
         version: '1.0.0',
 
         // Create framework instance
         create: (container) => new ElementCore(container),
-
-        // Extend tags
-        extendTags: (newTags) => Object.assign(tags, newTags)
     };
 
     // Export for different environments
@@ -510,31 +432,6 @@
         global.ElementCoreFramework = ElementCore;
         global.BaseComponent = BaseComponent;
         global.ComponentRegistry = ComponentRegistry;
-        
-        // Also expose tags globally for convenience
-        global.tags = tags;
-    }
-
-    // Auto-initialize if container with data-elementcore attribute exists
-    if (typeof document !== 'undefined') {
-        document.addEventListener('DOMContentLoaded', () => {
-            const containers = document.querySelectorAll('[data-elementcore]');
-            containers.forEach(container => {
-                const configScript = container.getAttribute('data-elementcore');
-                if (configScript) {
-                    try {
-                        // Use Function constructor for safe evaluation
-                        const configFactory = new Function('return (' + configScript + ')');
-                        const config = configFactory();
-                        const app = new ElementCore(container);
-                        app.render(config);
-                    } catch (error) {
-                        console.error('Auto-initialization failed:', error);
-                        container.innerHTML = '<div style="color: red; padding: 10px;">Configuration Error: ' + error.message + '</div>';
-                    }
-                }
-            });
-        });
     }
 
 })(typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : this);
