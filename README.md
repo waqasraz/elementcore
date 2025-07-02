@@ -1,7 +1,7 @@
 # ElementCore Framework
 
 A lightweight, pure JavaScript component framework that focuses on simplicity and direct DOM manipulation without the overhead of virtual DOM or complex reactivity systems.
-Minified version less than 10K.
+Minified version less than 8KB.
 
 ## Features
 
