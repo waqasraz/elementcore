@@ -1,4 +1,4 @@
-# ElementCore Framework
+# ElementCore Framework v1.0
 
 A lightweight, pure JavaScript component framework that focuses on simplicity and direct DOM manipulation without the overhead of virtual DOM or complex reactivity systems.
 Minified version less than 8KB.
@@ -9,9 +9,16 @@ Minified version less than 8KB.
 - **⚡ Direct DOM Access**: Render once, manipulate directly
 - **🎯 Simple State**: Object-based state with manual change handling
 - **📦 Component System**: Class-based components with lifecycle methods
-- **🏷️ Namespaced Components**: Use dot notation for organized component naming
 - **🔌 Plugin Architecture**: Extensible through plugins
 - **📝 Pure JavaScript**: No JSON limitations, full JavaScript object syntax
+- **🏗️ Cross-Environment**: Works in browser, Node.js, and AMD environments
+
+## IMPORTANT
+
+- **Render Once**: Components render once, updates via direct DOM manipulation
+- **No Virtual DOM**: Direct DOM operations for maximum speed
+- **Minimal Overhead**: Small framework footprint (~8KB minified)
+- **Efficient Updates**: Manual state management eliminates unnecessary re-renders
 
 ## Installation
 
@@ -39,7 +46,7 @@ app.render({
         { 
             tag: 'button', 
             children: ['Click me!'],
-            onclick: () => alert('Button clicked!')
+            onClick: () => alert('Button clicked!')
         }
     ]
 });
@@ -61,7 +68,7 @@ const config = {
         'Text content',
         { tag: 'span', children: ['Nested element'] }
     ],
-    onclick: handleClick     // Event handlers
+    onClick: handleClick     // Event handlers (camelCase)
 };
 ```
 
@@ -70,7 +77,7 @@ const config = {
 The `const` property allows you to get direct references to DOM elements:
 
 ```javascript
-class MyComponent extends BaseComponent {
+class MyComponent extends ElementCore.BaseComponent {
     render() {
         return {
             tag: 'div',
@@ -84,7 +91,7 @@ class MyComponent extends BaseComponent {
                     tag: 'button',
                     const: 'submitBtn',  // Creates this.submitBtn reference
                     children: ['Submit'],
-                    onclick: () => this.handleSubmit()
+                    onClick: () => this.handleSubmit()
                 }
             ]
         };
@@ -104,7 +111,7 @@ class MyComponent extends BaseComponent {
 State is a simple object. Changes require manual handling via `onStateChange`:
 
 ```javascript
-class Counter extends BaseComponent {
+class Counter extends ElementCore.BaseComponent {
     constructor(id, props, manager) {
         super(id, props, manager);
         this.state = { count: 0 };
@@ -122,7 +129,7 @@ class Counter extends BaseComponent {
                 {
                     tag: 'button',
                     children: ['Increment'],
-                    onclick: () => this.increment()
+                    onClick: () => this.increment()
                 }
             ]
         };
@@ -132,44 +139,20 @@ class Counter extends BaseComponent {
         this.setState({ count: this.state.count + 1 });
     }
 
-    onStateChange() {
+    // ElementCore v1.0 requires parameter in onStateChange
+    onStateChange(newState) {
         // Manually update the DOM when state changes
         this.display.textContent = `Count: ${this.state.count}`;
     }
 }
 ```
 
-### 4. Component Namespacing
-
-Use dot notation to organize related components:
-
-```javascript
-// Register namespaced components
-ComponentRegistry.register('ToDoApp', ToDoAppComponent);
-ComponentRegistry.register('ToDo.Item', ToDoItemComponent);
-ComponentRegistry.register('ToDo.List', ToDoListComponent);
-
-// Usage
-const config = {
-    tag: 'ToDoApp',
-    children: [
-        {
-            tag: 'ToDo.List',
-            children: [
-                { tag: 'ToDo.Item', text: 'Learn ElementCore' },
-                { tag: 'ToDo.Item', text: 'Build awesome apps' }
-            ]
-        }
-    ]
-};
-```
-
 ## BaseComponent Class
 
-All custom components extend `BaseComponent`:
+All custom components extend `ElementCore.BaseComponent`:
 
 ```javascript
-class MyComponent extends BaseComponent {
+class MyComponent extends ElementCore.BaseComponent {
     constructor(id, props, manager) {
         super(id, props, manager);
         this.state = {}; // Initialize state
@@ -188,8 +171,8 @@ class MyComponent extends BaseComponent {
         // Called after component is added to DOM
     }
 
-    onStateChange() {
-        // Called after setState()
+    onStateChange(newState) {
+        // Called after setState() - NOTE: parameter required in v1.0
         // Handle DOM updates manually
     }
 
@@ -206,7 +189,7 @@ class MyComponent extends BaseComponent {
 2. **Render**: `render()` method called to get configuration
 3. **DOM Creation**: DOM elements created from configuration
 4. **Mount**: `onMount()` called after DOM insertion
-5. **State Changes**: `onStateChange()` called after `setState()`
+5. **State Changes**: `onStateChange(newState)` called after `setState()`
 6. **Destruction**: `onDestroy()` called before removal
 
 ## Component Registration
@@ -215,7 +198,7 @@ Register components to use them by name:
 
 ```javascript
 // Register a component
-ComponentRegistry.register('MyButton', MyButtonComponent);
+ElementCore.ComponentRegistry.register('MyButton', MyButtonComponent);
 
 // Use in configuration
 const config = {
@@ -232,7 +215,7 @@ const config = {
 Components render their DOM structure once. Subsequent updates are done through direct DOM manipulation:
 
 ```javascript
-class LiveClock extends BaseComponent {
+class LiveClock extends ElementCore.BaseComponent {
     onMount() {
         // Update time every second via direct DOM manipulation
         this.timer = setInterval(() => {
@@ -273,50 +256,23 @@ const config = {
     else: {
         tag: 'button',
         children: ['Login'],
-        onclick: showLogin
+        onClick: showLogin
     }
-};
-```
-
-### Switch Rendering
-
-Use `switch/cases` for multiple conditions:
-
-```javascript
-const config = {
-    switch: () => user.role,
-    cases: {
-        'admin': { tag: 'AdminPanel' },
-        'user': { tag: 'UserDashboard' },
-        'guest': { tag: 'LoginForm' }
-    },
-    default: { tag: 'div', children: ['Access Denied'] }
 };
 ```
 
 ## Advanced Features
 
-### Shorthand Syntax
-
-Use the `c` property as shorthand for `children`:
-
-```javascript
-const config = {
-    tag: 'div',
-    c: ['Short for children']  // Same as children: ['Short for children']
-};
-```
-
 ### Event Handling
 
-Attach event handlers directly:
+Attach event handlers using camelCase naming:
 
 ```javascript
 const config = {
     tag: 'button',
-    onclick: handleClick,
-    onmouseenter: handleHover,
-    onkeydown: handleKeypress
+    onClick: handleClick,
+    onMouseEnter: handleHover,
+    onKeyDown: handleKeypress
 };
 ```
 
@@ -325,7 +281,7 @@ const config = {
 Add/remove children dynamically:
 
 ```javascript
-class DynamicList extends BaseComponent {
+class DynamicList extends ElementCore.BaseComponent {
     addItem(text) {
         const newItem = this.addChild({
             tag: 'li',
@@ -355,33 +311,61 @@ const MyPlugin = {
 };
 
 // Register plugin
-PluginManager.register('MyPlugin', MyPlugin);
+ElementCore.PluginManager.register('MyPlugin', MyPlugin);
 ```
 
-## Auto-initialization
+## Framework API
 
-ElementCore can auto-initialize from HTML:
+### ElementCore Main Object
 
-```html
-<div data-elementcore="{
-    tag: 'div',
-    children: ['Auto-initialized content']
-}"></div>
+```javascript
+// Create framework instance
+const app = ElementCore.create(container);
+
+// Access framework classes
+ElementCore.BaseComponent
+ElementCore.ComponentRegistry
+ElementCore.ComponentManager
+ElementCore.ConfigParser
+ElementCore.PluginManager
+
+// Version info
+console.log(ElementCore.version); // "1.0.0"
+```
+
+### Component Registry Methods
+
+```javascript
+// Register component
+ElementCore.ComponentRegistry.register('ComponentName', ComponentClass);
+
+// Check if component exists
+ElementCore.ComponentRegistry.has('ComponentName');
+
+// Get component class
+ElementCore.ComponentRegistry.get('ComponentName');
+
+// List all registered components
+ElementCore.ComponentRegistry.list();
+
+// Remove component
+ElementCore.ComponentRegistry.remove('ComponentName');
 ```
 
 ## Best Practices
 
 1. **Keep Components Small**: Focus on single responsibilities
-2. **Use Namespacing**: Organize related components with dot notation
-3. **Direct DOM Updates**: Leverage `const` references for efficient updates
-4. **Cleanup Resources**: Always cleanup in `onDestroy()`
-5. **State Simplicity**: Keep state flat and simple
-6. **Manual Updates**: Embrace manual DOM updates for performance
+2. **Use Direct DOM Updates**: Leverage `const` references for efficient updates
+3. **Cleanup Resources**: Always cleanup in `onDestroy()`
+4. **State Simplicity**: Keep state flat and simple
+5. **Manual Updates**: Embrace manual DOM updates for performance
+6. **Use Proper Namespacing**: Access framework classes via `ElementCore.*`
+7. **Event Handler Naming**: Use camelCase for event handlers (`onClick`, not `onclick`)
 
 ## Complete Example
 
 ```javascript
-class TodoApp extends BaseComponent {
+class TodoApp extends ElementCore.BaseComponent {
     constructor(id, props, manager) {
         super(id, props, manager);
         this.state = { 
@@ -403,12 +387,12 @@ class TodoApp extends BaseComponent {
                     tag: 'input',
                     const: 'input',
                     placeholder: 'Add new todo...',
-                    onkeydown: (e) => e.key === 'Enter' && this.addTodo()
+                    onKeyDown: (e) => e.key === 'Enter' && this.addTodo()
                 },
                 {
                     tag: 'button',
                     children: ['Add'],
-                    onclick: () => this.addTodo()
+                    onClick: () => this.addTodo()
                 },
                 {
                     tag: 'ul',
@@ -427,7 +411,7 @@ class TodoApp extends BaseComponent {
         this.input.value = '';
     }
 
-    onStateChange() {
+    onStateChange(newState) {
         // Re-render todo list
         this.todoList.innerHTML = '';
         this.state.todos.forEach(todo => {
@@ -448,7 +432,7 @@ class TodoApp extends BaseComponent {
 }
 
 // Register and use
-ComponentRegistry.register('TodoApp', TodoApp);
+ElementCore.ComponentRegistry.register('TodoApp', TodoApp);
 
 const app = ElementCore.create(document.getElementById('app'));
 app.render({ tag: 'TodoApp' });
@@ -462,5 +446,8 @@ MIT License - Feel free to use in your projects!
 
 **Mubbasher Mukhtar**
 - GitHub: [@mubbasher16](https://github.com/mubbasher16)
-- LinkedIn: [Mubbsaher-Mukhtar](https://www.linkedin.com/in/mubbasher-mukhtar/)
+- LinkedIn: [Mubbasher-Mukhtar](https://www.linkedin.com/in/mubbasher-mukhtar/)
 
+## Contributing
+
+Contributions are welcome! Please read the contributing guidelines and submit pull requests to the GitHub repository.
