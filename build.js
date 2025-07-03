@@ -37,7 +37,7 @@ async function buildDist() {
         }
 
         // Add version comment
-        const versionComment = `/*! ElementCore v1.0.0 | MIT License | https://github.com/waqasra2022skipq/elementcore */\n`;
+        const versionComment = `/*! ElementCore v1.0.0 | MIT License | https://github.com/mubbasher16/elementcore */\n`;
         const minifiedWithComment = versionComment + minified.code;
 
         // Write minified file
