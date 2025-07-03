@@ -17,18 +17,46 @@ Minified version less than 8KB.
 
 - **Render Once**: Components render once, updates via direct DOM manipulation
 - **No Virtual DOM**: Direct DOM operations for maximum speed
-- **Minimal Overhead**: Small framework footprint (~8KB minified)
+- **Minimal Overhead**: Small framework footprint (~5.5KB minified core)
 - **Efficient Updates**: Manual state management eliminates unnecessary re-renders
+- **Modular Components**: Use only what you need - core + optional components
+
+## Live Demos
+
+🚀 **Try ElementCore in action:**
+
+- **[Framework Demos](https://mubbasher16.github.io/elementcore/demos/demos.html)** - Interactive examples of core features
+- **[List Component Demo](https://mubbasher16.github.io/elementcore/demos/ListDemo.html)** - Efficient list rendering with filtering and sorting
+- **[Table Component Demo](https://mubbasher16.github.io/elementcore/demos/TableDemo.html)** - Advanced table with pagination and custom cells
 
 ## Installation
 
+### NPM
+```bash
+npm install elementcore
+```
+
+### CDN
 ```html
-<script src="elementcore.js"></script>
+<script src="https://unpkg.com/elementcore/dist/elementcore.min.js"></script>
+```
+
+### Download
+```html
+<!-- Core framework only (5.5KB minified) -->
+<script src="elementcore.min.js"></script>
+
+<!-- Optional: Add components as needed -->
+<script src="ListComponent.js"></script>
+<script src="TableComponent.js"></script>
 ```
 
 Or using modules:
 ```javascript
 import ElementCore from './elementcore.js';
+// Optional: Import components separately
+import './ListComponent.js';
+import './TableComponent.js';
 ```
 
 ## Quick Start
