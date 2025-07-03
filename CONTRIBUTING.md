@@ -19,7 +19,7 @@ Thank you for your interest in contributing to ElementCore! This document provid
 
 ### Setup
 ```bash
-git clone https://github.com/waqasra2022skipq/elementcore.git
+git clone https://github.com/waqasraz/elementcore.git
 cd elementcore
 npm install
 ```
