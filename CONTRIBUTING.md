@@ -5,7 +5,7 @@ Thank you for your interest in contributing to ElementCore! This document provid
 ## Getting Started
 
 1. Fork the repository
-2. Clone your fork: `git clone https://github.com/your-username/elementcore.git`
+2. Clone your fork: `git clone https://github.com/mubbasher16/elementcore`
 3. Install dependencies: `npm install`
 4. Make your changes
 5. Build and test: `npm run build`
@@ -19,7 +19,7 @@ Thank you for your interest in contributing to ElementCore! This document provid
 
 ### Setup
 ```bash
-git clone https://github.com/waqasraz/elementcore.git
+git clone https://github.com/mubbasher16/elementcore
 cd elementcore
 npm install
 ```

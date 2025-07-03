@@ -16,15 +16,12 @@ async function buildDist() {
         const listComponent = fs.readFileSync('src/ListComponent.js', 'utf8');
         const tableComponent = fs.readFileSync('src/TableComponent.js', 'utf8');
 
-        // Create combined file
-        const combined = `${elementCore}\n\n${listComponent}\n\n${tableComponent}`;
+        // Build ElementCore core only (no combined file)
+        fs.writeFileSync('dist/elementcore.js', elementCore);
+        console.log('✓ Created dist/elementcore.js (core only)');
 
-        // Write unminified combined file
-        fs.writeFileSync('dist/elementcore.js', combined);
-        console.log('✓ Created dist/elementcore.js');
-
-        // Minify the combined file
-        const minified = await minify(combined, {
+        // Minify ElementCore core
+        const minified = await minify(elementCore, {
             mangle: true,
             compress: {
                 drop_console: false,
@@ -47,20 +44,23 @@ async function buildDist() {
         fs.writeFileSync('dist/elementcore.min.js', minifiedWithComment);
         console.log('✓ Created dist/elementcore.min.js');
 
-        // Copy individual components to dist
-        fs.writeFileSync('dist/elementcore-core.js', elementCore);
+        // Copy components to dist (separate from core)
         fs.writeFileSync('dist/ListComponent.js', listComponent);
         fs.writeFileSync('dist/TableComponent.js', tableComponent);
         
-        console.log('✓ Created individual component files');
+        console.log('✓ Created separate component files');
 
         // Get file sizes
         const coreSize = fs.statSync('dist/elementcore.js').size;
         const minSize = fs.statSync('dist/elementcore.min.js').size;
+        const listSize = fs.statSync('dist/ListComponent.js').size;
+        const tableSize = fs.statSync('dist/TableComponent.js').size;
         
         console.log(`\nBuild complete!`);
-        console.log(`- Full version: ${(coreSize / 1024).toFixed(2)} KB`);
-        console.log(`- Minified: ${(minSize / 1024).toFixed(2)} KB`);
+        console.log(`- ElementCore: ${(coreSize / 1024).toFixed(2)} KB`);
+        console.log(`- ElementCore minified: ${(minSize / 1024).toFixed(2)} KB`);
+        console.log(`- ListComponent: ${(listSize / 1024).toFixed(2)} KB`);
+        console.log(`- TableComponent: ${(tableSize / 1024).toFixed(2)} KB`);
         
     } catch (error) {
         console.error('Build failed:', error);
